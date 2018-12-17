@@ -2,6 +2,31 @@ import numpy as np
 import random
 from copy import deepcopy
 
+# Number of iterations to simulate your hand strength
+# via the Monte Carlo method implemented in
+# calculateStrengthOfHand
+iterations = 150
+
+# Subject to change, because we may need to standardize the
+# values of the predictors of opponent action
+action = {
+    "fold": -1,
+    "check": 0,
+    "call": 1, 
+    "bet": 2,
+    "raise": 2,
+
+    # This is just for bug correcting will not influence action made
+    # show is not a valid move it is just to correct bugs
+    "show": 0
+}
+
+action_time = {
+    "HOLE": 2,
+    "FLOP": 4,
+    "TURN": 6,
+    "RIVER": 8
+}
 
 deck = [    {"value": 0, "suit": "heart"},
             {"value": 1, "suit": "heart"},
@@ -112,4 +137,28 @@ lookup_table = {
 }
 
 
-training = ["Full Tilt Poker Game #1: Table Cleverpiggy - FL Hold'em - 2/4 - 02:47:10 GMT - 2018/12/17", 'Seat 1: anonymous (1000)', 'Seat 2: Cleverpiggy (1000)', 'anonymous posts the small blind of 1', 'Cleverpiggy posts the big blind of 2', '*** HOLE CARDS ***', 'Dealt to anonymous [Qh 6d]', 'anonymous raises to 4', 'Cleverpiggy calls 2', '*** FLOP *** [7s 7c Jc]', 'Cleverpiggy checks', 'anonymous bets 2', 'Cleverpiggy raises to 4', 'anonymous raises to 6', 'Cleverpiggy calls 2', '*** TURN *** [7h]', 'Cleverpiggy bets 4', 'anonymous raises to 8', 'Cleverpiggy calls 4', '*** RIVER *** [Js]', 'Cleverpiggy bets 4', 'anonymous calls 4', '*** Show Down ***', 'Cleverpiggy shows [Jh 8d]', 'Cleverpiggy wins the pot ($44)', "Full Tilt Poker Game #2: Table Cleverpiggy - FL Hold'em - 2/4 - 02:47:37 GMT - 2018/12/17", 'Seat 1: anonymous (978)', 'Seat 2: Cleverpiggy (1022)', 'Cleverpiggy posts the small blind of 1', 'anonymous posts the big blind of 2', '*** HOLE CARDS ***', 'Dealt to anonymous [2d Kh]', 'Cleverpiggy folds', '*** Show Down ***', 'Cleverpiggy shows [2h 5d]', 'anonymous wins the pot ($2)', "Full Tilt Poker Game #3: Table Cleverpiggy - FL Hold'em - 2/4 - 02:47:43 GMT - 2018/12/17", 'Seat 1: anonymous (979)', 'Seat 2: Cleverpiggy (1021)', 'anonymous posts the small blind of 1', 'Cleverpiggy posts the big blind of 2', '*** HOLE CARDS ***', 'Dealt to anonymous [Ad Kh]', 'anonymous raises to 4', 'Cleverpiggy calls 2', '*** FLOP *** [2d 7s 7h]', 'Cleverpiggy checks', 'anonymous checks', '*** TURN *** [6c]', 'Cleverpiggy bets 4', 'anonymous calls 4', '*** RIVER *** [5d]', 'Cleverpiggy bets 4', 'anonymous calls 4', '*** Show Down ***', 'Cleverpiggy shows [Ts 6h]', 'Cleverpiggy wins the pot ($24)', "Full Tilt Poker Game #4: Table Cleverpiggy - FL Hold'em - 2/4 - 02:48:15 GMT - 2018/12/17", 'Seat 1: anonymous (967)', 'Seat 2: Cleverpiggy (1033)', 'Cleverpiggy posts the small blind of 1', 'anonymous posts the big blind of 2', '*** HOLE CARDS ***', 'Dealt to anonymous [5h 5s]', 'Cleverpiggy raises to 4', 'anonymous raises to 6', 'Cleverpiggy calls 2', '*** FLOP *** [Kh As Js]', 'anonymous bets 2', 'Cleverpiggy calls 2', '*** TURN *** [8c]', 'anonymous bets 4', 'Cleverpiggy calls 4', '*** RIVER *** [7d]', 'anonymous bets 4', 'Cleverpiggy calls 4', '*** Show Down ***', 'Cleverpiggy shows [2s Ks]', 'Cleverpiggy wins the pot ($32)', "Full Tilt Poker Game #5: Table Cleverpiggy - FL Hold'em - 2/4 - 02:48:42 GMT - 2018/12/17", 'Seat 1: anonymous (951)', 'Seat 2: Cleverpiggy (1049)', 'anonymous posts the small blind of 1', 'Cleverpiggy posts the big blind of 2', '*** HOLE CARDS ***', 'Dealt to anonymous [3d 5h]', 'anonymous raises to 4', 'Cleverpiggy calls 2', '*** FLOP *** [5d 2h 7s]', 'Cleverpiggy bets 2', 'anonymous calls 2', '*** TURN *** [Ts]', 'Cleverpiggy bets 4', 'anonymous raises to 8', 'Cleverpiggy calls 4', '*** RIVER *** [Qd]', 'Cleverpiggy checks', 'anonymous checks', '*** Show Down ***', 'Cleverpiggy shows [4d 5s]', 'anonymous ties for the pot ($14)', 'Cleverpiggy ties for the pot ($14)', "Full Tilt Poker Game #6: Table Cleverpiggy - FL Hold'em - 2/4 - 02:49:11 GMT - 2018/12/17", 'Seat 1: anonymous (951)', 'Seat 2: Cleverpiggy (1049)', 'Cleverpiggy posts the small blind of 1', 'anonymous posts the big blind of 2', '*** HOLE CARDS ***', 'Dealt to anonymous [9s As]', 'Cleverpiggy raises to 4', 'anonymous raises to 6', 'Cleverpiggy raises to 8', 'anonymous calls 2', '*** FLOP *** [5c Ah 7s]', 'anonymous bets 2', 'Cleverpiggy raises to 4', 'anonymous raises to 6', 'Cleverpiggy calls 2', '*** TURN *** [2d]', 'anonymous bets 4', 'Cleverpiggy calls 4', '*** RIVER *** [Qh]', 'anonymous bets 4', 'Cleverpiggy calls 4', '*** Show Down ***', 'Cleverpiggy shows [7c Kd]', 'anonymous wins the pot ($44)', "Full Tilt Poker Game #7: Table Cleverpiggy - FL Hold'em - 2/4 - 02:50:06 GMT - 2018/12/17", 'Seat 1: anonymous (973)', 'Seat 2: Cleverpiggy (1027)', 'anonymous posts the small blind of 1', 'Cleverpiggy posts the big blind of 2', '*** HOLE CARDS ***', 'Dealt to anonymous [8c Qc]', 'anonymous raises to 4', 'Cleverpiggy calls 2', '*** FLOP *** [3h 7d 3s]', 'Cleverpiggy checks', 'anonymous checks', '*** TURN *** [5s]', 'Cleverpiggy checks', 'anonymous checks', '*** RIVER *** [Jc]', 'Cleverpiggy checks', 'anonymous checks', '*** Show Down ***', 'Cleverpiggy shows [2c 9h]', 'anonymous wins the pot ($8)', "Full Tilt Poker Game #8: Table Cleverpiggy - FL Hold'em - 2/4 - 02:50:37 GMT - 2018/12/17", 'Seat 1: anonymous (977)', 'Seat 2: Cleverpiggy (1023)', 'Cleverpiggy posts the small blind of 1', 'anonymous posts the big blind of 2', '*** HOLE CARDS ***', 'Dealt to anonymous [As Qs]', 'Cleverpiggy folds', '*** Show Down ***', 'Cleverpiggy shows [4h 3c]', 'anonymous wins the pot ($2)', "Full Tilt Poker Game #9: Table Cleverpiggy - FL Hold'em - 2/4 - 02:50:44 GMT - 2018/12/17", 'Seat 1: anonymous (978)', 'Seat 2: Cleverpiggy (1022)', 'anonymous posts the small blind of 1', 'Cleverpiggy posts the big blind of 2', '*** HOLE CARDS ***', 'Dealt to anonymous [Kh Qs]', 'anonymous calls 1', 'Cleverpiggy raises to 4', 'anonymous raises to 6', 'Cleverpiggy calls 2', '*** FLOP *** [Ac 5s Qc]', 'Cleverpiggy bets 2', 'anonymous calls 2', '*** TURN *** [6d]', 'Cleverpiggy bets 4', 'anonymous calls 4', '*** RIVER *** [8c]', 'Cleverpiggy bets 4', 'anonymous calls 4', '*** Show Down ***', 'Cleverpiggy shows [3h As]', 'Cleverpiggy wins the pot ($32)', "Full Tilt Poker Game #10: Table Cleverpiggy - FL Hold'em - 2/4 - 02:51:23 GMT - 2018/12/17", 'Seat 1: anonymous (962)', 'Seat 2: Cleverpiggy (1038)', 'Cleverpiggy posts the small blind of 1', 'anonymous posts the big blind of 2', '*** HOLE CARDS ***', 'Dealt to anonymous [Qd 7d]', 'Cleverpiggy raises to 4', 'anonymous calls 2', '*** FLOP *** [2h 6c 6s]', 'anonymous bets 2', 'Cleverpiggy raises to 4', 'anonymous raises to 6', 'Cleverpiggy calls 2', '*** TURN *** [3c]', 'anonymous bets 4', 'Cleverpiggy calls 4', '*** RIVER *** [Jc]', 'anonymous checks', 'Cleverpiggy checks', '*** Show Down ***', 'Cleverpiggy shows [Td 2d]', 'Cleverpiggy wins the pot ($28)', "Full Tilt Poker Game #11: Table Cleverpiggy - FL Hold'em - 2/4 - 02:52:01 GMT - 2018/12/17", 'Seat 1: anonymous (948)', 'Seat 2: Cleverpiggy (1052)', 'anonymous posts the small blind of 1', 'Cleverpiggy posts the big blind of 2', '*** HOLE CARDS ***', 'Dealt to anonymous [As 2c]', 'anonymous calls 1', 'Cleverpiggy raises to 4', 'anonymous calls 2']
+def decideAnAction(ourStrength, oppStrength, chipStack=-69, ourWeight=2, oppWeight=2):
+    mean = ourWeight*float(ourStrength) - oppWeight*float(oppStrength)
+    randomDraw = np.random.normal(mean,1,1)#mean, sd, number of draws
+
+    foldThreshold = -1# threshold for doing a wrong action
+    raiseThreshold = 1
+
+    if randomDraw < foldThreshold:
+        # Must change later because we are just always calling or raising
+        # Must add folding aspect to the game
+        return "call"
+    elif randomDraw > raiseThreshold:
+        return "raise"
+    else:
+        return "call"
+
+
+def decision_maker_logistic(approx_model, our_strength, opp_strength, \
+                            curr_chip_stack, strength_of_cards, ):
+    predicted = [[our_strength, opp_strength, curr_chip_stack, strength_of_cards]]
+    approx_model.predict(predicted)
+
+
+
+

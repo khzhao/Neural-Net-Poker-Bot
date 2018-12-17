@@ -1,30 +1,6 @@
 from dependencies import *
 import hand_winner as hw
 
-# Subject to change, because we may need to standardize the
-# values of the predictors of opponent action
-action = {
-	"fold": -1,
-	"check": 0,
-	"call": 1, 
-	"bet": 2,
-	"raise": 2,
-	# This is just for bug correcting will not influence action made
-	"show": 0
-}
-
-action_time = {
-	"HOLE": 2,
-	"FLOP": 4,
-	"TURN": 6,
-	"RIVER": 8
-}
-
-# Number of iterations to simulate your hand strength
-# via the Monte Carlo method implemented in
-# calculateStrengthOfHand
-iterations = 150
-
 # Divides the raw content list into list of games played unedited
 # raw content list can be obtained from the parse_contents function
 def game_division(training):
@@ -213,23 +189,4 @@ def get_training_np_arrays(list_of_games, time, you_go_first):
 
 	return X, y
 
-		
-
-
-
-
-
-
-
-
-
-
-
 	
-
-
-
-
-
-
-

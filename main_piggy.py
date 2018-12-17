@@ -16,21 +16,6 @@ def parse_contents(contents):
 	return contents[2:]
 
 
-def decideAnAction(ourStrength, oppStrength, chipStack=-69, ourWeight=2, oppWeight=2):
-	mean = ourWeight*float(ourStrength) - oppWeight*float(oppStrength)
-	randomDraw = np.random.normal(mean,1,1)#mean, sd, number of draws
-
-	foldThreshold = -1# threshold for doing a wrong action
-	raiseThreshold = 1
-
-	if randomDraw < foldThreshold:
-		return "fold"
-	elif randomDraw > raiseThreshold:
-		return "raise"
-	else:
-		return "call"
-
-
 class CleverPiggy:
 	def __init__(self):
 		self.piggy_url = "http://www.cleverpiggy.com/limitbot"
@@ -79,22 +64,22 @@ class CleverPiggy:
 		our_strength = 0.5
 
 		if "RIVER" in recent_as_str:
-			our_strength = hw.calculateStrengthOfHand(recent.river)
+			our_strength = hw.calculateStrengthOfHand(recent.river, iterations)
 			first = do_you_go_first(recent_game, "RIVER")
 			num_cols = action_time["RIVER"] - first
 			opp_strength = self.models[num_cols-1].predict([predictors[:num_cols]])
 		elif "TURN" in recent_as_str:
-			our_strength = hw.calculateStrengthOfHand(recent.turn)
+			our_strength = hw.calculateStrengthOfHand(recent.turn, iterations)
 			first = do_you_go_first(recent_game, "TURN")
 			num_cols = action_time["TURN"] - first
 			opp_strength = self.models[num_cols-1].predict([predictors[:num_cols]])
 		elif "FLOP" in recent_as_str:
-			our_strength = hw.calculateStrengthOfHand(recent.flop)
+			our_strength = hw.calculateStrengthOfHand(recent.flop, iterations)
 			first = do_you_go_first(recent_game, "FLOP")
 			num_cols = action_time["FLOP"] - first
 			opp_strength = self.models[num_cols-1].predict([predictors[:num_cols]])
 		elif "HOLE" in recent_as_str:
-			our_strength = hw.calculateStrengthOfHand(recent.preflop)
+			our_strength = hw.calculateStrengthOfHand(recent.preflop, iterations)
 			first = do_you_go_first(recent_game, "HOLE")
 			num_cols = action_time["HOLE"] - first
 			opp_strength = self.models[num_cols-1].predict([predictors[:num_cols]])
@@ -103,6 +88,7 @@ class CleverPiggy:
 		print(recent_as_str)
 		print(predictors)
 		print(chosen_action)
+		print("YOUR HAND STRENGTH IS: ", our_strength)
 		return chosen_action
 
 	def acquire_data(self):
@@ -120,8 +106,9 @@ class CleverPiggy:
 		if is_trained: self.load_models()
 
 		try:
+			sleep(2)
 			while True:
-				sleep(6.9)
+				sleep(2)
 				curr = BeautifulSoup(self.driver.page_source)
 				infobox = curr.find(id="infobox")
 				raw_contents = parse_contents(infobox.contents)
@@ -129,11 +116,9 @@ class CleverPiggy:
 				if not is_trained:
 					chosen_action = actions[random.randint(1, 2)]
 				else:
-					print("NO LONGER RANDOM YESSSS")
 					chosen_action = self.next_move(raw_contents)	
 					
 				self.driver.find_element_by_id(chosen_action).click()
-				print("Action made")
 		finally:
 			raw_infobox = curr.find(id="infobox")
 			infobox = parse_contents(raw_infobox.contents)
