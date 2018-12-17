@@ -9,6 +9,8 @@ action = {
 	"call": 1, 
 	"bet": 2,
 	"raise": 2,
+	# This is just for bug correcting will not influence action made
+	"show": 0
 }
 
 action_time = {
