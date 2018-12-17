@@ -8,15 +8,23 @@ action = {
 	"check": 0,
 	"call": 1, 
 	"bet": 2,
-	"raise": 2
+	"raise": 2,
+}
+
+action_time = {
+	"HOLE": 2,
+	"FLOP": 4,
+	"TURN": 6,
+	"RIVER": 8
 }
 
 # Number of iterations to simulate your hand strength
 # via the Monte Carlo method implemented in
 # calculateStrengthOfHand
-iterations = 169
+iterations = 150
 
 # Divides the raw content list into list of games played unedited
+# raw content list can be obtained from the parse_contents function
 def game_division(training):
 	games = []
 	curr_game = []
@@ -36,6 +44,14 @@ def game_division(training):
 		else:
 			curr_game.append(training[i])
 	return games
+
+
+def last_game(training):
+	backwards = list(reversed(training))
+	for i in range(len(backwards)):
+		if "Full Tilt Poker Game" in backwards[i]:
+			return list(reversed(backwards[:i+1]))
+	return []
 
 
 # Find out whether you are big blind or small blind, game
@@ -101,26 +117,29 @@ def find_opp_action(game, time):
 				i += 1
 			break
 		i += 1
-	return float("-inf")
+	return 0
 
 
 # Find opponent hand in the current game
 def find_opp_hand(game):
 	output = []
 	i = 0
-	while i < len(game):
-		if "Show Down" in game[i]:
-			for card in game[i+1].split()[2:]:
-				if "[" in card and "]" in card:
-					output.append(card[1:-1])
-				elif "[" in card:
-					output.append(card[1:])
-				elif "]" in card:
-					output.append(card[:-1])
-				else:
-					output.append(card)
-		i += 1
-	return [lookup_table[res] for res in output]
+	try:
+		while i < len(game):
+			if "Show Down" in game[i]:
+				for card in game[i+1].split()[2:]:
+					if "[" in card and "]" in card:
+						output.append(card[1:-1])
+					elif "[" in card:
+						output.append(card[1:])
+					elif "]" in card:
+						output.append(card[:-1])
+					else:
+						output.append(card)
+			i += 1
+		return [lookup_table[res] for res in output]
+	except:
+		return output
 
 
 # Current game is given by an index returned from
@@ -176,12 +195,6 @@ def get_training_np_arrays(list_of_games, time, you_go_first):
 	relevent_games = filter_games(list_of_games, time, you_go_first)
 	length = len(relevent_games)
 	num_col = None
-	action_time = {
-		"HOLE": 2,
-		"FLOP": 4,
-		"TURN": 6,
-		"RIVER": 8
-	}
 
 	num_cols = action_time[time] - you_go_first
 	X = []
