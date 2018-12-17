@@ -1,6 +1,10 @@
 import numpy as np
 import random
 from copy import deepcopy
+import math
+
+def sigmoid(x):
+  return 1 / (1 + math.exp(-x))
 
 # Number of iterations to simulate your hand strength
 # via the Monte Carlo method implemented in
@@ -154,10 +158,26 @@ def decideAnAction(ourStrength, oppStrength, chipStack=-69, ourWeight=2, oppWeig
         return "call"
 
 
-def decision_maker_logistic(approx_model, our_strength, opp_strength, \
-                            curr_chip_stack, strength_of_cards, ):
-    predicted = [[our_strength, opp_strength, curr_chip_stack, strength_of_cards]]
-    approx_model.predict(predicted)
+def decision_maker(approx_model, predictors):
+    # predictors are our_strength, opp_strength, starting_stack, opponent_actions
+    # response is whether we won the hand or not
+    # Now we must squash the action_value
+    action_value = sigmoid(approx_model.predict(predictors))
+    randomDraw = np.random.normal(action_value, 1, 1)
+    foldThreshold = -0.5# threshold for doing a wrong action
+    raiseThreshold = 1.5
+
+    if randomDraw < foldThreshold:
+        # Must change later because we are just always calling or raising
+        # Must add folding aspect to the game
+        return "fold"
+    elif randomDraw > raiseThreshold:
+        return "raise"
+    else:
+        return "call"
+
+
+
 
 
 

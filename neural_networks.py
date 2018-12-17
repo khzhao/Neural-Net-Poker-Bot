@@ -1,4 +1,5 @@
 from sklearn.neural_network import MLPRegressor
+from sklearn.linear_model import LinearRegression
 import pickle
 
 
@@ -34,3 +35,8 @@ def train_and_save_models(X1, y1, X2, y2, X3, y3, X4, y4, X5, y5, X6, y6, X7, y7
 def import_model(filename):
 	model = pickle.load(open(filename, 'rb'))
 	return model
+
+def train_and_save_decision_model(X1, y1):
+	lr = LinearRegression()
+	lr.fit(X1, y1)
+	pickle.dump(lr, open("models/decision_model.sav", "wb"))
