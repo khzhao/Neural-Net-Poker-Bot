@@ -2,6 +2,7 @@ from dependencies import *
 
 import hand_winner as hw
 import neural_networks as NN
+from time import sleep
 
 card_to_actual = {
 	0: "2",
@@ -415,7 +416,7 @@ if __name__ == "__main__":
 			else:
 				human_bot.chipstack += pot
 				print("The bot had "+give_readable_cards(human_bot.cards))
-				print("You lost. You just got castrated by the machine. Your chipstack is now only "+str(user_chip_stack))
+				print("You lost. Your chipstack is now only "+str(user_chip_stack))
 				sleep(3)
 				state = "post blinds"
 
