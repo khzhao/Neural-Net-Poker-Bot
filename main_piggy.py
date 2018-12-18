@@ -143,7 +143,7 @@ class CleverPiggy:
 		try:
 			sleep(2)
 			while True:
-				sleep(6.9)
+				sleep(7)
 				curr = BeautifulSoup(self.driver.page_source)
 				infobox = curr.find(id="infobox")
 				raw_contents = parse_contents(infobox.contents)

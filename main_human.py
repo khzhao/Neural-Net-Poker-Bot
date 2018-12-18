@@ -156,7 +156,7 @@ if __name__ == "__main__":
 	while True:
 		
 		if state == "post blinds":
-			print("*** WELCOME TO A NEW GAME OF CASTRATION POKER ***")
+			print("*** WELCOME TO A NEW GAME OF POKER ***")
 			# initialize new dealer, complete with new deck of cards!
 			dealer = Dealer()
 			
