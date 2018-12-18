@@ -1,10 +1,10 @@
-#Package dependencies:
-	* brew cask install chromedriver
-	* pip install selenium
-	* pip install numpy
-	* pip install bs4
-	* pip install pickle
-	* pip install sklearn
+# Package dependencies:
+	1. brew cask install chromedriver
+	2. pip install selenium
+	3. pip install numpy
+	4. pip install bs4
+	5. pip install pickle
+	6. pip install sklearn
 
 
 ## How to run the project
