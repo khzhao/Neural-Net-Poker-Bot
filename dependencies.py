@@ -162,10 +162,11 @@ def decision_maker(approx_model, predictors):
     # predictors are our_strength, opp_strength, starting_stack, opponent_actions
     # response is whether we won the hand or not
     # Now we must squash the action_value
-    action_value = sigmoid(approx_model.predict(predictors))
+    action_value = sigmoid(approx_model.predict(predictors))/2
+    print("THE ACTION VALUE IS: ", action_value)
     randomDraw = np.random.normal(action_value, 1, 1)
     foldThreshold = -0.5# threshold for doing a wrong action
-    raiseThreshold = 1.5
+    raiseThreshold = 1
 
     if randomDraw < foldThreshold:
         # Must change later because we are just always calling or raising
