@@ -11,8 +11,7 @@ def sigmoid(x):
 # calculateStrengthOfHand
 iterations = 150
 
-# Subject to change, because we may need to standardize the
-# values of the predictors of opponent action
+# standardize the values of the predictors of opponent action
 action = {
     "fold": -1,
     "check": 0,
